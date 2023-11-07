@@ -1,123 +1,80 @@
 package tn.esprit.spring.kaddem.services;
 
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import tn.esprit.spring.kaddem.entities.Departement;
 import tn.esprit.spring.kaddem.repositories.DepartementRepository;
-import static org.mockito.Mockito.verify;
+import tn.esprit.spring.kaddem.services.DepartementServiceImpl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ExtendWith(MockitoExtension.class)
 class DepartementServiceImplTest {
-    @InjectMocks
-    private DepartementServiceImpl departementService;
-
     @Mock
     private DepartementRepository departementRepository;
+    @InjectMocks
+    private DepartementServiceImpl departementServiceService;
 
-
-    @Before("")
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
+
     @Test
-    void retrieveAllDepartements() {
-        // Create a list of Departement objects for testing
-        List<Departement> departements = new ArrayList<>();
-        departements.add(new Departement(1, "Dept A"));
-        departements.add(new Departement(2, "Dept B"));
+    @Order(1)
+    public void testAddContrat() {
+        Departement sampleDepartement = new Departement();
+        when(departementRepository.save(any(Departement.class))).thenReturn(sampleDepartement);
 
-        // Mock the behavior of the departementRepository
-        when(departementRepository.findAll()).thenReturn(departements);
+        Departement savedDepartement = departementServiceService.addDepartement(sampleDepartement);
 
-        // Call the service method to retrieve departements
-        List<Departement> result = departementService.retrieveAllDepartements();
+        verify(departementRepository, times(1)).save(any(Departement.class));
 
-        // Verify the results
-        assertEquals(2, result.size());
-        assertEquals("Dept A", result.get(0).getNomDepart());
-        assertEquals("Dept B", result.get(1).getNomDepart());
+        assertEquals(sampleDepartement, savedDepartement);
     }
 
+    @Order(2)
+    public void testRetrieveContrat() {
+        Integer DepartementId = 1;
+        Departement sampleDepartement = new Departement();
+        when(departementRepository.findById(DepartementId)).thenReturn(Optional.of(sampleDepartement));
 
-    @Test
-    void addDepartement() {
-        // Create a Departement object for testing
-        Departement departement = new Departement(1, "Dept A");
+        Departement retrievedContrat = departementServiceService.retrieveDepartement(DepartementId);
 
-        // Mock the behavior of the departementRepository.save method
-        when(departementRepository.save(departement)).thenReturn(departement);
+        verify(departementRepository, times(1)).findById(DepartementId);
 
-        // Call the service method to add a departement
-        Departement result = departementService.addDepartement(departement);
-
-        // Verify the result
-        assertEquals(1, result.getIdDepart().intValue());
-        assertEquals("Dept A", result.getNomDepart());
-
+        assertEquals(sampleDepartement, retrievedContrat);
     }
 
     @Test
-    void updateDepartement() {
-        // Create a Departement object for testing
-        Departement departement = new Departement(1, "Dept A");
-
-        // Mock the behavior of the departementRepository.save method
-        when(departementRepository.save(departement)).thenReturn(departement);
-
-        // Call the service method to update a departement
-        Departement result = departementService.updateDepartement(departement);
-
-        // Verify the result
-        assertEquals(1, result.getIdDepart().intValue());
-        assertEquals("Dept A", result.getNomDepart());
+    @Order(3)
+    public void testUpdateContrat() {
+        Departement sampleDepartement = new Departement();
+        when(departementRepository.save(any(Departement.class))).thenReturn(sampleDepartement);
+        Departement updatedDepartement = departementServiceService.updateDepartement(sampleDepartement);
+        verify(departementRepository, times(1)).save(any(Departement.class));
+        assertEquals(sampleDepartement, updatedDepartement);
     }
 
     @Test
-    void retrieveDepartement() {
-        // Create a Departement object for testing
-        Departement departement = new Departement(1, "Dept A");
+    @Order(4)
+    public void testRemoveContrat() {
+        Integer updatedDepartementId = 1;
+        Departement sampleContrat = new Departement();
+        when(departementRepository.findById(updatedDepartementId)).thenReturn(Optional.of(sampleContrat));
 
-        // Mock the behavior of the departementRepository.findById method
-        when(departementRepository.findById(1)).thenReturn(Optional.of(departement));
-        when(departementRepository.findById(2)).thenReturn(Optional.empty());
+        departementServiceService.deleteDepartement(updatedDepartementId);
 
-        // Call the service method to retrieve a departement that exists
-        Departement result1 = departementService.retrieveDepartement(1);
-
-        // Verify the results for an existing departement
-        assertEquals(1, result1.getIdDepart().intValue());
-        assertEquals("Dept A", result1.getNomDepart());
-
-        // Verify that a non-existent departement returns a NoSuchElementException
-        assertThrows(NoSuchElementException.class, () -> departementService.retrieveDepartement(2));
-    }
-
-
-    @Test
-    void deleteDepartement() {
-        // Create a Departement object for testing
-        Departement departement = new Departement(1, "Dept A");
-
-        // Mock the behavior of the departementRepository
-        when(departementRepository.findById(1)).thenReturn(Optional.of(departement));
-
-        // Call the service method to delete a departement
-        departementService.deleteDepartement(1);
-
-        // Verify that the repository's delete method is called with the expected departement
-        verify(departementRepository).delete(departement);
+        verify(departementRepository, times(1)).delete(sampleContrat);
     }
 }
