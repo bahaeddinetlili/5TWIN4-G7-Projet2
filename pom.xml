@@ -68,8 +68,8 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>KaddemProject</finalName>
     </build>
-
     <distributionManagement>
         <repository>
             <id>deploymentRepo</id>
