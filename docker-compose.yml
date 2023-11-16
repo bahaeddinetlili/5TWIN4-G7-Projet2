@@ -9,7 +9,7 @@ services:
       - MYSQL_ROOT_PASSWORD=Myroot000
       - MYSQL_DATABASE=kaddemdb
     ports:
-      - 3307:3306
+      - 3306:3306
     volumes:
       - db:/var/lib/mysql
     networks:
@@ -18,7 +18,7 @@ services:
     image: backend
     depends_on:
       - mysqldb
-    build: ./
+    build: .
     restart: on-failure
     ports:
       - 8089:8089
