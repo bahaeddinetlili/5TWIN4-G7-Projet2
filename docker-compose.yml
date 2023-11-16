@@ -14,7 +14,7 @@ services:
   app-timesheet:
     build:
       context: .
-      dockerfile: 28
+      dockerfile: Dockerfile
     ports:
       - "8089:8089"
     depends_on:
