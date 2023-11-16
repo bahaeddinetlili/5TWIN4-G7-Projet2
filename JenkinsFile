@@ -33,6 +33,13 @@ pipeline {
                 }
             }
 
+            stage('JUnit / Mockito') {
+                steps {
+                      sh 'mvn test'
+                      junit '**/target/surefire-reports/TEST-*.xml'
+                 }
+             }
+
 
 
 }
