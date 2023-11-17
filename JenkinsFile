@@ -31,16 +31,6 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image Back To DHub') {
-            steps {
-               withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhubpwd')]) {
-                sh 'docker login -u riahinourelhouda -p $dockerhubpwd'
-                sh 'docker tag devops_back_project riahinourelhouda/devops_back_project:latest'
-                sh 'docker push riahinourelhouda/devops_back_project:latest'
-              }
-            }
-        }
-
 
         stage('Docker compose') {
             steps {

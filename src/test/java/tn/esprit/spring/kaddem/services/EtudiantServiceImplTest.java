@@ -70,7 +70,7 @@ class EtudiantServiceImplTest {
     }
 
 
-   
+
     @Test
     void retrieveEtudiant() {
 
