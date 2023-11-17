@@ -61,7 +61,7 @@ pipeline {
                     script {
                         withCredentials([string(credentialsId: 'docker-pwd', variable: 'dockerpwd')]) {
                             sh 'docker login -u moiyse -p ${dockerpwd}'
-                            sh 'docker push moezmahmoud-5twin4-g7-devops:1.0.0'
+                            sh 'docker push moiyse/moezmahmoud-5twin4-g7-devops:1.0.0'
 
 
                         }
