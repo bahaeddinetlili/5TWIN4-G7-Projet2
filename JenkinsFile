@@ -1,85 +1,66 @@
 pipeline {
-        agent any
+    agent any
 
-        stages {
-            stage('Chekout GIT'){
-                steps {
-                    echo 'Pulling...'
-                        git branch: 'master' ,
-                        url : 'https://github.com/bahaeddinetlili/5TWIN4-G7-Projet2.git'
-                }
-            }
-
-            stage('MVN CLEAN') {
-                steps{
-                    sh 'mvn clean install';
-
-                }
-
-            }
-
-             stage('MVN COMPILE') {
-                steps{
-                    sh 'mvn compile';
-
-                }
-
-            }
-
-
-
-             stage('Test with Maven') {
-                steps {
-                      sh 'mvn test'
-                      junit '**/target/surefire-reports/TEST-*.xml'
-                 }
-             }
-
-
-                    stage('MVN SONARQUBE') {
+        stage('unit test Backend') {
             steps {
-                sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=sonar -Dmaven.test.skip=true';
+                sh 'mvn test'
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+
+        /*stage('Sonarqube Analysis') {
+            steps {
+                sh "mvn sonar:sonar -Dsonar.host.url=http://localhost:9000/ -Dsonar.token=squ_728e06f59496b2cb913571a6947028d011652e38 -Dsonar.projectName='devops_backend'-Dsonar.sources=src/main -Dsonar.tests=src/test"
+              }
+        }*/
+
+
+        /*stage('nexus deploy') {
+            steps {
+                sh 'mvn deploy -Dmaven.test.skip=true'
+            }
+        }*/
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t devops_back_project .'
+            }
+        }
+
+        stage('Push Docker Image Back To DHub') {
+            steps {
+               withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhubpwd')]) {
+                sh 'docker login -u riahinourelhouda -p $dockerhubpwd'
+                sh 'docker tag devops_back_project riahinourelhouda/devops_back_project:latest'
+                sh 'docker push riahinourelhouda/devops_back_project:latest'
+              }
             }
         }
 
 
-                    stage('MVN NEXUS') {
-              steps {
-
-                     sh 'mvn deploy -Dmaven.test.skip=true';
-             }
-        }
-
-         stage('Docker images') {
+        stage('Docker compose') {
             steps {
-                script {
-                    sh 'docker build -t bahaeddine2/devops:backend .'
-                    sh 'docker pull mysql:5.7'
-
-
-                }
+                sh 'docker compose up -d'
             }
         }
-      stage('push image to hub') {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'docker-pss', variable: 'dockerpss')]) {
-                        sh 'docker login -u bahaeddine2 -p ${dockerpss}'
-                        sh 'docker push bahaeddine2/devops:backend'
 
+    }
 
-                    }
-                }
+    post {
+            success {
+                mail to : 'eya.kasmi@esprit.tn',
+                subject: 'ProjectDevops Pipeline - Success',
+                body: 'ProjectDevops pipeline has successfully completed .'
+            }
+
+            failure {
+                mail to : 'eya.kasmi@esprit.tn',
+                subject: 'ProjectDevops Pipeline - Failure',
+                body: 'ProjectDevops pipeline has failed completed .'
             }
         }
-      stage(' Docker Compose') {
-            steps {
-                script {
-                    sh 'docker compose up -d '
-                }
-            }
-         }
-
 }
-        }
-
