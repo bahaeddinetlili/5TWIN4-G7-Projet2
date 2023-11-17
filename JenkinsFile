@@ -2,7 +2,7 @@ pipeline {
         agent any
 
         stages {
-            stage('Chekout GIT'){
+            stage('Pull from GIT'){
                 steps {
                     echo 'Pulling...'
                         git branch: 'MoezMahmoud-5Twin4-G7' ,
@@ -10,7 +10,7 @@ pipeline {
                 }
             }
 
-            stage('MVN CLEAN') {
+            stage('MVN clean & install') {
                 steps{
                     sh 'mvn clean install';
 
@@ -18,7 +18,7 @@ pipeline {
 
             }
 
-             stage('MVN COMPILE') {
+             stage('MVN compile') {
                 steps{
                     sh 'mvn compile';
 
@@ -27,7 +27,7 @@ pipeline {
             }
 
 
-            stage('MVN SONARQUBE') {
+            stage('SONARQUBE') {
                 steps {
                     sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=sonar -Dmaven.test.skip=true';
                 }
@@ -40,13 +40,13 @@ pipeline {
                  }
              }
 
-             stage('Nexus') {
+             stage('Nexus deploy') {
                 steps {
                       sh 'mvn deploy -Dmaven.test.skip=true'
                  }
              }
 
-            stage('Docker images') {
+            stage('Docker Build images') {
                 steps {
                     script {
                         sh 'docker build -t moezmahmoud-5twin4-g7-devops:1.0.0 .'
@@ -56,19 +56,19 @@ pipeline {
                     }
                 }
             }
-            stage('push docker image') {
+            stage('Push image Dockerhub') {
                 steps {
                     script {
                         withCredentials([string(credentialsId: 'docker-pwd', variable: 'dockerpwd')]) {
                             sh 'docker login -u moiyse -p ${dockerpwd}'
-                            sh 'docker push moiyse/moezmahmoud-5twin4-g7-devops:1.0.0'
+                            sh 'docker push moiyse/moezmahmoud'
 
 
                         }
                     }
                 }
             }
-            stage(' Docker Compose') {
+            stage('Docker Compose') {
                 steps {
                     script {
                         sh 'docker compose up -d '
