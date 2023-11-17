@@ -49,7 +49,7 @@ pipeline {
             stage('Docker images') {
                 steps {
                     script {
-                        sh 'docker build -t bahaeddine2/devops:backend .'
+                        sh 'docker build -t moiyse/devops:backend .'
                         sh 'docker pull mysql:5.7'
 
 
@@ -59,8 +59,8 @@ pipeline {
             stage('push docker image') {
                 steps {
                     script {
-                        withCredentials([string(credentialsId: 'docker-pss', variable: 'dockerpss')]) {
-                            sh 'docker login -u moiyse -p ${dockerpss}'
+                        withCredentials([string(credentialsId: 'docker-pwd', variable: 'dockerpwd')]) {
+                            sh 'docker login -u moiyse -p ${dockerpwd}'
                             sh 'docker push moiyse/devops:backend'
 
 
