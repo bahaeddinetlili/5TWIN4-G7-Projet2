@@ -11,28 +11,29 @@ services:
       - springboot-app
       - mysqldb
 
-  springboot-app:
-    container_name: spring-app
-    image: skander25/alpine:0.0.1-SPRING
-    restart: always
-    ports:
-      - 8088:8089
-    environment:
-      MYSQL_HOST: mysqldb
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
-      MYSQL_PORT: 3306
 
+  springboot-app:
+
+      image: skander25/alpine:0.0.1-SPRING
+      restart: always
+      build: .
+      ports:
+        - 8066:8089
+      environment:
+        MYSQL_HOST: mysqldb
+        MYSQL_USER: root
+        MYSQL_PASSWORD: root
+        MYSQL_PORT: 3306
   mysqldb:
-    container_name: mysqldb
-    image: mysql
-    volumes:
-      - /home/Kaddem/DevopsProject/db:/var/lib/mysql
-    ports:
-      - 3307:3306
-    environment:
-      MYSQL_DATABASE: kaddemdb
-      MYSQL_ROOT_PASSWORD: root
+      container_name: mysqldb
+      image: mysql
+      volumes:
+        - /home/user/Desktop/db:/var/lib/mysql
+      ports:
+        - 3307:3306
+      environment:
+        MYSQL_DATABASE: kaddemdb
+        MYSQL_ROOT_PASSWORD: root
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
