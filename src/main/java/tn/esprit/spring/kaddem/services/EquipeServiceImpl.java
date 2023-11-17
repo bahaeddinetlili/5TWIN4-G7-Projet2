@@ -1,52 +1,68 @@
 package tn.esprit.spring.kaddem.services;
 
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
-import tn.esprit.spring.kaddem.entities.Contrat;
-import tn.esprit.spring.kaddem.entities.Equipe;
-import tn.esprit.spring.kaddem.entities.Etudiant;
-import tn.esprit.spring.kaddem.entities.Niveau;
+import tn.esprit.spring.kaddem.entities.*;
+import tn.esprit.spring.kaddem.repositories.DetailEquipeRepository;
 import tn.esprit.spring.kaddem.repositories.EquipeRepository;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-@Slf4j
-@AllArgsConstructor
+
 @Service
-public class EquipeServiceImpl implements IEquipeService{
+public class EquipeServiceImpl implements IEquipeService {
+	@Autowired
 	EquipeRepository equipeRepository;
 
+	@Autowired
+	DetailEquipeRepository detailEquipeRepository;
 
-	public List<Equipe> retrieveAllEquipes(){
-	return  (List<Equipe>) equipeRepository.findAll();
+
+	public List<Equipe> retrieveAllEquipes() {
+		return (List<Equipe>) equipeRepository.findAll();
 	}
-	public Equipe addEquipe(Equipe e){
+
+	public Equipe addEquipe(Equipe e) {
 		return (equipeRepository.save(e));
 	}
 
-	public  void deleteEquipe(Integer idEquipe){
-		Equipe e=retrieveEquipe(idEquipe);
+	public void deleteEquipe(Integer idEquipe) {
+		Equipe e = retrieveEquipe(idEquipe);
 		equipeRepository.delete(e);
 	}
 
-	public Equipe retrieveEquipe(Integer equipeId){
+	public Equipe retrieveEquipe(Integer equipeId) {
 		return equipeRepository.findById(equipeId).get();
 	}
 
-	public Equipe updateEquipe(Equipe e){
-	return (	equipeRepository.save(e));
+	@Override
+	public void assignEquipeToDetailEquipe(Integer idEquipe, Integer idDetailEquipe) {
+		Equipe e = equipeRepository.findById(idEquipe).get();
+		DetailEquipe detailEquipe = detailEquipeRepository.findById(idDetailEquipe).get();
+
+		e.setDetailEquipe(detailEquipe);
+		equipeRepository.save(e);
+
 	}
 
-	public void evoluerEquipes(){
+	public Equipe updateEquipe(Equipe e, Integer idEquipe) {
+		Equipe equipeExistant = equipeRepository.findById(idEquipe).get();
+		if (equipeExistant != null){
+			equipeExistant.setNomEquipe(e.getNomEquipe());
+			equipeExistant.setNiveau(e.getNiveau());
+			return equipeRepository.save(equipeExistant);
+		}
+		return null;
+	}
+
+	public void evoluerEquipes() {
 		List<Equipe> equipes = (List<Equipe>) equipeRepository.findAll();
 		for (Equipe equipe : equipes) {
 			if ((equipe.getNiveau().equals(Niveau.JUNIOR)) || (equipe.getNiveau().equals(Niveau.SENIOR))) {
 				List<Etudiant> etudiants = (List<Etudiant>) equipe.getEtudiants();
-				Integer nbEtudiantsAvecContratsActifs=0;
+				Integer nbEtudiantsAvecContratsActifs = 0;
 				for (Etudiant etudiant : etudiants) {
 					Set<Contrat> contrats = etudiant.getContrats();
 					//Set<Contrat> contratsActifs=null;
@@ -62,17 +78,17 @@ public class EquipeServiceImpl implements IEquipeService{
 						if (nbEtudiantsAvecContratsActifs >= 3) break;
 					}
 				}
-					if (nbEtudiantsAvecContratsActifs >= 3){
-						if (equipe.getNiveau().equals(Niveau.JUNIOR)){
-							equipe.setNiveau(Niveau.SENIOR);
-							equipeRepository.save(equipe);
-							break;
-						}
-						if (equipe.getNiveau().equals(Niveau.SENIOR)){
-							equipe.setNiveau(Niveau.EXPERT);
-							equipeRepository.save(equipe);
-							break;
-						}
+				if (nbEtudiantsAvecContratsActifs >= 3) {
+					if (equipe.getNiveau().equals(Niveau.JUNIOR)) {
+						equipe.setNiveau(Niveau.SENIOR);
+						equipeRepository.save(equipe);
+						break;
+					}
+					if (equipe.getNiveau().equals(Niveau.SENIOR)) {
+						equipe.setNiveau(Niveau.EXPERT);
+						equipeRepository.save(equipe);
+						break;
+					}
 				}
 			}
 
