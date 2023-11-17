@@ -49,7 +49,7 @@ pipeline {
             stage('Docker images') {
                 steps {
                     script {
-                        sh 'docker build -t MoezMahmoud-5Twin4-G7-Devops:1.0.0 .'
+                        sh 'docker build -t moezmahmoud-5twin4-g7-devops:1.0.0 .'
                         sh 'docker pull mysql:5.7'
 
 
@@ -61,7 +61,7 @@ pipeline {
                     script {
                         withCredentials([string(credentialsId: 'docker-pwd', variable: 'dockerpwd')]) {
                             sh 'docker login -u moiyse -p ${dockerpwd}'
-                            sh 'docker push MoezMahmoud-5Twin4-G7-Devops:1.0.0'
+                            sh 'docker push moezmahmoud-5twin4-g7-devops:1.0.0'
 
 
                         }
