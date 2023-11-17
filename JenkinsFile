@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    stages {
+        stage('Checkout Backend From Git') {
+            steps {
+                script {
+                    checkout([$class: 'GitSCM', branches: [[name: 'eya']], userRemoteConfigs: [[url: 'https://github.com/bahaeddinetlili/5TWIN4-G7-Projet2']]])
+                }
+            }
+        }
+
         stage('unit test Backend') {
             steps {
                 sh 'mvn test'
@@ -13,11 +22,13 @@ pipeline {
             }
         }
 
-        /*stage('Sonarqube Analysis') {
+         stage('MVN SONARQUBE') {
             steps {
-                sh "mvn sonar:sonar -Dsonar.host.url=http://localhost:9000/ -Dsonar.token=squ_728e06f59496b2cb913571a6947028d011652e38 -Dsonar.projectName='devops_backend'-Dsonar.sources=src/main -Dsonar.tests=src/test"
-              }
-        }*/
+                sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=admin -Dmaven.test.skip=true';
+            }
+        }
+
+
 
 
         /*stage('nexus deploy') {
@@ -30,13 +41,23 @@ pipeline {
                 sh 'docker build -t devops_back_project .'
             }
         }
+        stage('Push Docker Image Back To DHub') {
+            steps {
+               withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhubpwd')]) {
+                sh 'docker login -u kasseya -p $dockerhubpwd'
+                sh 'docker tag devops_back_project kasseya/devops_back_project:latest'
+                sh 'docker push kasseya/devops_back_project:latest'
+
+              }
+            }
+        }
 
 
-        stage('Docker compose') {
+        /*stage('Docker compose') {
             steps {
                 sh 'docker compose up -d'
             }
-        }
+        }*/
 
     }
 
