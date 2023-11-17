@@ -5,7 +5,7 @@ pipeline {
             stage('Chekout GIT'){
                 steps {
                     echo 'Pulling...'
-                        git branch: 'Moez' ,
+                        git branch: 'MoezMahmoud-5Twin4-G7' ,
                         url : 'https://github.com/bahaeddinetlili/5TWIN4-G7-Projet2.git'
                 }
             }
